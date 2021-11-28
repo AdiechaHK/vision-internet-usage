@@ -13,7 +13,8 @@ func hello(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	port := os.Getenv("PORT")
-	http.HandleFunc("/", hello)
+	http.Handle("/", http.FileServer(http.Dir("./static")))
+	// http.HandleFunc("/", hello)
 	fmt.Println("Listening on port: " + port)
 	http.ListenAndServe(":"+port, nil)
 }
