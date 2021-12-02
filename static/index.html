@@ -4,9 +4,68 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <title>HK :: Internet Usage</title>
 </head>
 <body>
     <h1>Hello word !</h1>
+    <div id="app">
+    {{ message }}
+
+    <hr>
+
+    <table border="1" width="100%">
+        <thead>
+            <tr>
+                <th>Recorded at</th>
+                <th>Used</th>
+                <th>Available</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="x in list">
+                <td> {{x.recorded_at | datetime}} </td>
+                <td> {{x.used | mem}} </td>
+                <td> {{x.available | mem}} </td>
+                <td> {{(x.used + x.available) | mem}} </td>
+            </tr>
+        </tbody>
+    </table>
+
+    </div>
+      
+    <script>
+
+        Vue.filter('mem', val => {
+            if (val > 1024) {
+                return (Math.round(100*val/1024) / 100) + " GB"
+            } else {
+                return val + " MB"
+            }
+        });
+
+        Vue.filter('datetime', val => {
+            return moment(val).format('Do MMM \'YY @ hh:mm A')
+        });
+
+        var app = new Vue({
+            el: '#app',
+            data: {
+                message: 'Hello Vue!',
+                list: []
+            },
+            mounted() {
+                fetch("/data")
+                    .then(response => response.json())
+                    .then(data => {
+                        this.list = data.records
+                    });
+            }
+        })
+
+    </script>
+
 </body>
 </html>

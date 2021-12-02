@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"hello-heroku/data"
 	"hello-heroku/schedule"
 	"io"
 	"net/http"
@@ -34,6 +36,15 @@ func main() {
 				schedule.TestFun()
 			} else {
 				port := os.Getenv("PORT")
+				http.HandleFunc("/data", func(w http.ResponseWriter, _ *http.Request) {
+					lst := data.GetData()
+					w.Header().Set("Content-Type", "application/json")
+					if lst != nil {
+						json.NewEncoder(w).Encode(lst)
+					} else {
+						json.NewEncoder(w).Encode(data.DataCollection{})
+					}
+				})
 				http.Handle("/", http.FileServer(http.Dir("./static")))
 				fmt.Println("Listening on port: " + port)
 				http.ListenAndServe(":"+port, nil)

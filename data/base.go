@@ -125,6 +125,24 @@ func addData(used int, remain int, gist *Gist) {
 
 }
 
+func GetData() *DataCollection {
+	gist := getGist()
+	fileName := os.Getenv("FILENAME")
+	for _, f := range gist.Files {
+		dc := DataCollection{}
+		if f.Name == fileName {
+			err := json.Unmarshal([]byte(f.Content), &dc)
+			if err != nil {
+				panic(err)
+			}
+			if len(dc.Records) > 0 {
+				return &dc
+			}
+		}
+	}
+	return nil
+}
+
 func StoreData(used int, remain int) {
 	gist := getGist()
 	addData(used, remain, gist)
