@@ -1,0 +1,1809 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><title>
+	iCREM
+</title><meta name="description" /><meta name="keywords" /><meta name="robots" content="index,follow" /><link rel="Stylesheet" type="text/css" href="./../css/jquery-ui.css" /><link rel="stylesheet" type="text/css" href="./../css/combined.css" />
+    
+    <script type="text/javascript" src="./../js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="./../js/jquery-ui.min.js"></script>
+    
+    <script type="text/javascript" src="./../js/combined.js"></script>
+    <script type="text/javascript" src="../js/chat.js"></script>
+    <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function () {
+            $('a.login-window').click(function () {
+
+                //Getting the variable's value from a link 
+                var loginBox = $(this).attr('href');
+
+                //Fade in the Popup
+                $(loginBox).fadeIn(300);
+
+                //Set the center alignment padding + border see css style
+                var popMargTop = ($(loginBox).height() + 24) / 2;
+                var popMargLeft = ($(loginBox).width() + 24) / 2;
+
+                $(loginBox).css({
+                    'margin-top': -popMargTop,
+                    'margin-left': -popMargLeft
+                });
+
+                // Add the mask to body
+                $('body').append('<div id="mask"></div>');
+                $('#mask').fadeIn(300);
+
+                return false;
+            });
+
+            // When clicking on the button close or the mask layer the popup closed
+            $('a.close, #mask').live('click', function () {
+                $('#mask , .login-popup').fadeOut(300, function () {
+                    $('#mask').remove();
+                });
+                return false;
+            });
+        });
+
+
+        //        ---------------------------------------------------------------
+        var clicked = false;
+        function CheckBrowser() {
+
+            if (clicked == false) {
+                //Browser closed
+            }
+            else {
+                //redirected 
+                clicked = false;
+            }
+        }
+
+        function bodyUnload() {
+            //alert("HI");
+            if (clicked == false)//browser is closed
+            {
+                //alert("Under");
+                //var request = GetRequest();
+
+                //location.href = 'LogOut.aspx';
+                var request = GetRequest();
+                //  alert(request);
+                var x = document.getElementById('lbllgout');
+                //alert(x);
+                if (x != null) {
+                    // alert(x);
+                    var rtxt = document.getElementById('lblRtxt');
+
+                    if (x.value != 1 && rtxt.value == 0) {
+                        // alert("open");
+                        request.open("GET", "LogOut.aspx", true);
+                        request.send();
+                        // alert("complete");
+                    }
+                }
+            }
+        }
+        function GetRequest() {
+            //    alert("Gotoreq");
+            var request = null;
+            if (window.XMLHttpRequest) {
+                //alert("getrequest");
+                //incase of IE7,FF, Opera and Safari browser
+                request = new XMLHttpRequest();
+                //            request.open("GET","LogOut.aspx",false);
+                //            request.send();
+            }
+            else {
+                // alert("Else part");
+                //for old browser like IE 6.x and IE 5.x
+                request = new ActiveXObject('MSXML2.XMLHTTP.3.0');
+            }
+            return request;
+        }
+
+        function checkMail() {
+            //alert("Hi");
+            $.ajax({
+                url: "ChattingPage.aspx?getMail=1",
+                cache: false,
+                success: function (data) {
+                    //alert(data);	    
+                    if (data == "logout") {
+                        window.location = "Login.aspx?redir=true";
+                    }
+                    else if (data != 0) {
+                        $("#ctl00_lblMSG").html("Inbox ( " + data + " )");
+                        $("#ctl00_imgMessage").show();
+                    }
+                    else {
+                        $("#ctl00_imgMessage").hide();
+                    }
+                }
+            });
+
+            //setTimeout('checkMail();', 5000);
+        }
+        // checkMail();
+        //]]>
+
+        function fninvsh(Lay) {
+            var tagName = document.getElementById(Lay);
+            tagName.style.visibility = 'hidden';
+            tagName.style.display = 'none';
+        }
+
+        function fnvshNrm(Lay) {
+            var tagName = document.getElementById(Lay);
+            tagName.style.visibility = 'visible';
+            tagName.style.display = 'block';
+        }
+        function fnvsh(obj, Lay) {
+            var tagName = document.getElementById(Lay);
+            var leftSide = findPosX(obj);
+            var topSide = findPosY(obj);
+            tagName.style.left = leftSide + 175 + 'px';
+            tagName.style.top = topSide + 'px';
+            tagName.style.visibility = 'visible';
+        }
+
+        function fnvshobj(obj, Lay) {
+            var tagName = document.getElementById(Lay);
+            var leftSide = findPosX(obj);
+            var topSide = findPosY(obj);
+            var maxW = tagName.style.width;
+            var widthM = maxW.substring(0, maxW.length - 2);
+            if (Lay == 'editdiv') {
+                leftSide = leftSide - 225;
+                topSide = topSide - 125;
+            } else if (Lay == 'transferdiv') {
+                leftSide = leftSide - 10;
+                topSide = topSide;
+            }
+            var IE = document.all ? true : false;
+            if (IE) {
+                if ($("repposition1")) {
+                    if (topSide > 1200) {
+                        topSide = topSide - 250;
+                    }
+                }
+            }
+
+            var getVal = eval(leftSide) + eval(widthM);
+            if (getVal > document.body.clientWidth) {
+                leftSide = eval(leftSide) - eval(widthM);
+                tagName.style.left = leftSide + 34 + 'px';
+            }
+            else
+                tagName.style.left = leftSide + 'px';
+            tagName.style.top = topSide + 'px';
+            tagName.style.display = 'block';
+            tagName.style.visibility = "visible";
+        }
+        function findPosX(obj) {
+
+            var curleft = 0;
+
+            if (document.getElementById || document.all) {
+
+                while (obj.offsetParent) {
+
+                    curleft += obj.offsetLeft
+
+                    obj = obj.offsetParent;
+
+                }
+
+            } else if (document.layers) {
+
+                curleft += obj.x;
+
+            }
+
+
+
+            return curleft;
+
+        }
+
+
+
+        function findPosY(obj) {
+
+            var curtop = 0;
+
+
+
+            if (document.getElementById || document.all) {
+
+                while (obj.offsetParent) {
+
+                    curtop += obj.offsetTop
+
+                    obj = obj.offsetParent;
+
+                }
+
+            } else if (document.layers) {
+
+                curtop += obj.y;
+
+            }
+
+
+
+            return curtop;
+
+        }
+
+        jQuery.cookie = function (name, value, options) {
+            if (typeof value != 'undefined') { // name and value given, set cookie
+                options = options || {};
+                if (value === null) {
+                    value = '';
+                    options.expires = -1;
+                }
+                var expires = '';
+                if (options.expires && (typeof options.expires == 'number' || options.expires.toUTCString)) {
+                    var date;
+                    if (typeof options.expires == 'number') {
+                        date = new Date();
+                        date.setTime(date.getTime() + (options.expires * 24 * 60 * 60 * 1000));
+                    } else {
+                        date = options.expires;
+                    }
+                    expires = '; expires=' + date.toUTCString(); // use expires attribute, max-age is not supported by IE
+                }
+                // CAUTION: Needed to parenthesize options.path and options.domain
+                // in the following expressions, otherwise they evaluate to undefined
+                // in the packed version for some reason...
+                var path = options.path ? '; path=' + (options.path) : '';
+                var domain = options.domain ? '; domain=' + (options.domain) : '';
+                var secure = options.secure ? '; secure' : '';
+                document.cookie = [name, '=', encodeURIComponent(value), expires, path, domain, secure].join('');
+            } else { // only name given, get cookie
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        };
+
+        function ShowOptions(control, args) {
+            control._completionListElement.style.zIndex = 10000001;
+        }
+    </script>
+    
+    <style type="text/css">
+        .hid_unhide {
+            display: none;
+        }
+
+        #mask {
+            display: none;
+            background: #000;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+            z-index: 999;
+        }
+        /* You can customize to your needs  */ .login-popup {
+            display: none;
+            background: #333;
+            padding: 10px;
+            border: 2px solid #ddd;
+            float: left;
+            font-size: 1.2em;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 99999;
+            box-shadow: 0px 0px 20px #999; /* CSS3 */
+            -moz-box-shadow: 0px 0px 20px #999; /* Firefox */
+            -webkit-box-shadow: 0px 0px 20px #999; /* Safari, Chrome */
+            border-radius: 3px 3px 3px 3px;
+            -moz-border-radius: 3px; /* Firefox */
+            -webkit-border-radius: 3px; /* Safari, Chrome */
+        }
+
+        img.btn_close {
+            position: ttheclosebuttonfloat:right;
+            margin: -28px-28px00;
+        }
+
+        fieldset {
+            border: none;
+        }
+
+        form.signin .textbox label {
+            display: block;
+            padding-bottom: 7px;
+        }
+
+        form.signin .textbox span {
+            display: block;
+        }
+
+        form.signin p, form.signin span {
+            color: #999;
+            font-size: 11px;
+            line-height: 18px;
+        }
+
+        form.signin .textbox input {
+            background: #666666;
+            border-bottom: 1px solid #333;
+            border-left: 1px solid #000;
+            border-right: 1px solid #333;
+            border-top: 1px solid #000;
+            color: #fff;
+            border-radius: 3px 3px 3px 3px;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            font: 13px Arial, Helvetica, sans-serif;
+            padding: 6px 6px 4px;
+            width: 200px;
+        }
+
+        form.signin input:-moz-placeholder {
+            color: #bbb;
+            text-shadow: 0 0 2px #000;
+        }
+
+        form.signin input::-webkit-input-placeholder {
+            color: #bbb;
+            text-shadow: 0 0 2px #000;
+        }
+
+        .button {
+            background: -moz-linear-gradient(center top, #f3f3f3, #dddddd);
+            background: -webkit-gradient(linear, left top, left bottom, from(#f3f3f3), to(#dddddd));
+            background: -o-linear-gradient(top, #f3f3f3, #dddddd);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr= '#f3f3f3', EndColorStr= '#dddddd' );
+            border-color: #000;
+            border-width: 1px;
+            border-radius: 4px 4px 4px 4px;
+            -moz-border-radius: 4px;
+            -webkit-border-radius: 4px;
+            color: #333;
+            cursor: pointer;
+            display: inline-block;
+            padding: 6px 6px 4px;
+            margin-top: 10px;
+            font: 12px;
+            width: 214px;
+        }
+
+            .button:hover {
+                background: #ddd;
+            }
+
+        .allMnuTable {
+            width: 100%;
+            background-color: white;
+            height: 70px !important;
+        }
+
+        #allMenu {
+            width: 180px;
+            border: 4px solid #DDDCDD;
+            left: 0px;
+            top: 100px;
+            position: absolute;
+            z-index: 1000001;
+            display: none;
+            padding: 10px;
+            background: white;
+        }
+
+        #help {
+            width: 500px;
+            border: 4px solid #DDDCDD;
+            left: 300px;
+            top: 100px;
+            position: absolute;
+            z-index: 1000001;
+            display: none;
+            padding: 10px;
+            background: white;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            margin-left:200px;
+        }
+
+        .fade.in {
+            opacity: 1;
+        }
+
+        .alert-warning {
+            color: #8a6d3b;
+            background-color: #fcf8e3;
+            border-color: #faebcc;
+        }
+
+        .alert-dismissable, .alert-dismissible {
+            padding-right: 35px;
+        }
+
+        div {
+            display: block;
+        }
+
+        .alert-dismissable .close, .alert-dismissible .close {
+            position: relative;
+            top: -2px;
+            right: -21px;
+            color: inherit;
+        }
+
+        a.close {
+            text-decoration: none !important;
+            font-size: 18px !important;
+            line-height: 1.2;
+        }
+    </style>
+
+    
+    <!--[if IE]><script language="javascript" type="text/javascript" src="excanvas.pack.js"></script><![endif]-->
+    
+<link href="/vtpl/WebResource.axd?d=qRiHEPEGMA6zyRixTwoqnsSkMV_yytRjGUjh2vezCkWEE-QiFDwQSvqeFGreGjt3KhaL5PRzf1qDqIDa8a_XdnLnRfq0X44kAFxUTeLJyRyulAQeCSvpXUY6FG6PEyPyCZ83vGXyi9PogSAAVgb86Q2&amp;t=637728375148497141" type="text/css" rel="stylesheet" /></head>
+<body class="body1" onunload="bodyUnload();" onclick="clicked=true;">
+    <link rel="stylesheet" type="text/css" media="all" href='./../css/style5.css?1436278220' />
+    <div class="container" id="container" onunload="HandleClose()">
+        <form method="post" action="./AccountViewPlan.aspx" id="form1" enctype="multipart/form-data">
+<input type="hidden" name="ToolkitScriptManager1_HiddenField" id="ToolkitScriptManager1_HiddenField" value="" />
+<input type="hidden" name="ContentPlaceHolder1_tbAdditonal_ClientState" id="ContentPlaceHolder1_tbAdditonal_ClientState" value="{&quot;ActiveTabIndex&quot;:0,&quot;TabState&quot;:[true,true,true]}" />
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+
+
+<script src="/vtpl/ScriptResource.axd?d=UP6x8n4KjjPWG1mBwLMOo8eVQ0USw9B-imU6_1KcwVrEeRe3F6OG74cWFr1PUfTy-ca0zx0H_QHmLmkUNOWpf4qoYralkcLQSVOO1Lgc1PD67Sy1HIf-5qvq4Ts-jdt60&amp;t=2b6966cf" type="text/javascript"></script>
+<script src="/vtpl/ScriptResource.axd?d=gLj16krJlsoRUtl-FAAQQsPYLM4KCIZL_ERpCg2-jEL2vhlyvxKGa78FMadS57ThTlYWsrqKBtp_ZCRNxu1Fq_YRb8kEkac79RZLeKsPmAOSmIdsehJqgZXOa1knQa0RZrTWq-mdqOlIE0IkHnW-bg2&amp;t=2b6966cf" type="text/javascript"></script>
+<script src="/vtpl/customer/AccountViewPlan.aspx?_TSM_HiddenField_=ToolkitScriptManager1_HiddenField&amp;_TSM_CombinedScripts_=%3b%3bAjaxControlToolkit%2c+Version%3d4.1.60623.0%2c+Culture%3dneutral%2c+PublicKeyToken%3d28f01b0e84b6d53e%3aen-US%3a3a72dea3-4bbb-479b-8b97-903103ced56d%3a475a4ef5%3aeffe2a26%3a8e94f951%3a1d3ed089%3a751cdd15%3a5546a2b%3adfad98a5%3a497ef277%3aa43b07eb%3ad2e10b12%3a37e2e5c9%3a3cf12cf1%3af3d989c9" type="text/javascript"></script>
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="29F8450B" />
+<input type="hidden" name="__VIEWSTATEENCRYPTED" id="__VIEWSTATEENCRYPTED" value="" />
+<input type="hidden" name="__PREVIOUSPAGE" id="__PREVIOUSPAGE" value="KR07N9MCeuISyF4hak-27da0uiVjoZyCqBa0E4EslsGLUUkujRiDUfTNAAyMDVDTY7V61-L2uK7bnBmFBG2ZM3rbN7kKDgB9Os0NGn14pcnRqcRvRMR1We572PjnbIhE0" />
+<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="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" />
+            
+            <div id="header" id="logo" style="background-color: White; background-repeat: no-repeat; height: 80px; z-index: 1; position: relative">
+                </img>
+                  <span style="font-size: 12px; color: darkred; position: absolute; padding-top: 3%; margin-left: 3%; width:53% !important; word-break:break-all;">
+                    <span id="ltLicMsg" style="width:52%; word-break:break-all;"></span></span>
+                <div id="profile_info">
+                    <div id="newupdt">
+	
+                            <img src="./../img/avatar.png" id="avatar" alt="avatar" />
+                            <p>
+                                Welcome: <strong>
+                                    <a id="lblunm" href="javascript:__doPostBack(&#39;ctl00$lblunm&#39;,&#39;&#39;)" style="color: White">HARIKRUSHNA ADIECHA</a></strong><br />
+                                <a id="lbklogout" href="javascript:__doPostBack(&#39;ctl00$lbklogout&#39;,&#39;&#39;)">Logout</a>
+                                <br />
+                            </p>
+                            
+                            <input type="submit" name="ctl00$btnFree2" value="" id="btnFree2" style="display: none" />
+                            <div id="pnlcon" class="ModalWindow">
+		
+                                <span id="lblmsg"></span>
+                                <table class="table2" style="line-height: 22px !important; font-size: 12px !important; width: 500px !important; table-layout: auto"
+                                    border="0">
+                                    <tr>
+                                        <th colspan="4">Customer Information
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td>Name:
+                                        </td>
+                                        <td>
+                                            <span id="lblName"></span>
+                                        </td>
+                                        <td>Phone No:
+                                        </td>
+                                        <td>
+                                            <span id="lblphoneO"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Email:
+                                        </td>
+                                        <td>
+                                            <span id="lblemailid"></span>
+                                        </td>
+                                        <td>Website:
+                                        </td>
+                                        <td>
+                                            <span id="lblWebsite"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Userid:
+                                        </td>
+                                        <td>
+                                            <input name="ctl00$txtuserid" type="text" id="txtuserid" disabled="disabled" class="aspNetDisabled" />
+                                        </td>
+                                        <td>Password:
+                                        </td>
+                                        <td>
+                                            <input name="ctl00$txtPassword" type="password" id="txtPassword" disabled="disabled" class="aspNetDisabled" />
+                                        </td>
+                                    </tr>
+                                    <td align="center" colspan="4">
+                                        
+                                        <input type="submit" name="ctl00$btnEditPwd" value="Edit" id="btnEditPwd" class="btncrm" />
+                                        <input type="submit" name="ctl00$btnCancelCInfo" value="Cancel" id="btnCancelCInfo" class="btncrm" />
+                                    </td>
+                                </table>
+                            
+	</div>
+                        
+</div>
+                    <span id="upMsg">
+                            <span id="Timer1" style="display:none;"></span>
+                            <img id="imgMessage" src="../img/MessageboxInfo.png" style="display: none" />
+                        </span>
+                </div>
+                
+                <div class="tools">
+                    <div>
+                        <a href="javascript:;" onmouseout="fninvsh('allMenu');" onclick="fnvshobj(this,'allMenu')">
+                            
+
+                        </a>
+                        <div id="allMenu" onmouseout="fninvsh('allMenu');" onmouseover="fnvshNrm('allMenu');"
+                            style="width: 180px; z-index: 10000001; left: 400px !important; top: 100px; visibility: hidden; display: none;">
+                            <div class="allMnuTablediv">
+                                <table class="allMnuTable">
+                                    <tr>
+                                        <td class="allMnuHdr">
+                                            <label id="siteMap">
+                                            </label>
+                                            <ul>
+                                                <li><a href="Feedback.aspx">Feedback</a> </li>
+                                                <li><a href="Casemanagement.aspx">Case</a> </li>
+                                                <li><a href="Salesordermaster.aspx">Sales Order</a> </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <a href="Help/#" style="display: none">
+                            <img src="./../img/help.png" alt="Open All Menu..." title="Help" border="0" style="padding: 0px 0px 17px 5px;"></a>
+                        <a href="javascript:;" id="p1">
+                            <img src="./../img/chat.png" alt="Open All Menu..." title="Chat" border="0" style="padding: 8px 0px 12px 5px; display:none;"
+                                width="25px" height="25px"></a> <a href="Tag.aspx" id="tagshow"></a>
+                    </div>
+                </div>
+                <div id="uppop">
+	
+                        
+                        <input type="submit" name="ctl00$btnFree" value="" id="btnFree" style="display: none" />
+                        <div id="panEdit" class="ModalWindow">
+		
+                            <table id="table">
+                                <tr>
+                                    <th colspan="2">
+                                        <h3>Click to Call</h3>
+                                    </th>
+                                </tr>
+                                <tr style="height: auto; padding: 10px; background-color: #193356; color: White;">
+                                    <td>
+                                        <span style="color: White; text-align: center; padding-left: 10%">Purpose</span><span
+                                            style="color: Red">*</span>
+                                    </td>
+                                    <td>
+                                        <select name="ctl00$ddlpurpose" id="ddlpurpose" style="width: 84%">
+			<option value="0">Select</option>
+			<option value="1">Inquiry</option>
+			<option value="2">Issue</option>
+			<option value="3">Information</option>
+
+		</select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div style="height: auto; padding: 10px; border: 1px solid #eee">
+                                            <table id="table1" style="width: 100%">
+                                                <tr>
+                                                    <td>Name
+                                                    </td>
+                                                    <td>
+                                                        <input name="ctl00$txtname" readonly="readonly" id="txtname" type="text" style="width: 80%" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Company Name
+                                                    </td>
+                                                    <td>
+                                                        <input name="ctl00$txtcompany" readonly="readonly" id="txtcompany" type="text" style="width: 80%" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Email Id
+                                                    </td>
+                                                    <td>
+                                                        <input name="ctl00$txtemail" readonly="readonly" id="txtemail" type="text" style="width: 80%" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Phone No.
+                                                    </td>
+                                                    <td>
+                                                        <input name="ctl00$txtphone" readonly="readonly" id="txtphone" type="text" style="width: 80%" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Call Time<span style="color: Red">*</span>
+                                                    </td>
+                                                    <td>
+                                                        <select name="ctl00$ddlcallTime" id="ddlcallTime" style="width: 84%">
+			<option value="0">Select</option>
+			<option value="1">Immediate</option>
+			<option value="2">After 2 Hours</option>
+			<option value="3">Today Any Time</option>
+			<option value="4">Tommorrow</option>
+
+		</select>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="vertical-align: top">Description.
+                                                    </td>
+                                                    <td style="vertical-align: top;">
+                                                        <textarea name="ctl00$txtDisc" rows="2" cols="20" id="txtDisc" type="text" style="width: 82%">
+</textarea>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>&nbsp;
+                                                    </td>
+                                                    <td>
+                                                        <input type="submit" name="ctl00$callButton" value="Submit" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$callButton&quot;, &quot;&quot;, true, &quot;CTC&quot;, &quot;&quot;, false, false))" id="callButton" class="btncrm" />
+                                                        <input type="submit" name="ctl00$callCancel" value="Cancel" id="callCancel" class="btncrm" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <br />
+                                            <b>Note:</b>
+                                            <ul>
+                                                <li>This facility is currently available for any query on using iCRM Product or features
+                                                available. In case of any account specific queries please call us at Customer care
+                                                or write to us at<a href="mailto:support@height8tech.com" style="color: Blue; text-decoration: underline; cursor: pointer"> support@height8tech.com.</a> </li>
+                                                <li>Please note that this facility available only on weekdays between 10 am to 7 pm
+                                                </li>
+                                                <li>You will be connected to team of specialized and trained officers who will assist
+                                                you with any queries relating to product, features. </li>
+                                                <li>This is a free call back facility and call will be made to your registered contact
+                                                number with iCRM. This facility is currently available for numbers within India.
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div style="text-align: center; text-align: right; text-align: justify">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        
+	</div>
+                    
+</div>
+                
+            </div>
+
+            <div id="content" style="width: 100%">
+                <div id="top_menu" class="clearfix " style="width: 100%; float: left">
+                    <div class="home">
+                        <input type="image" name="ctl00$ImageButton1" id="ImageButton1" src="../img/home.png" alt="Home" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$ImageButton1&quot;, &quot;&quot;, false, &quot;&quot;, &quot;HomePage.aspx&quot;, false, false))" style="padding: 4px 9px 0px 10px" />
+                    </div>
+                    <div class="div_box">
+                        <ul id='base' class="sf-menu">
+                            
+                            <li>
+                                <a id="AccountPlanDetails" href="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$AccountPlanDetails&quot;, &quot;&quot;, false, &quot;&quot;, &quot;AccountViewPlan.aspx&quot;, false, true))">Plan</a></li>
+                            <li>
+                                <a id="AccountSessions" href="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$AccountSessions&quot;, &quot;&quot;, false, &quot;&quot;, &quot;AccountViewSession.aspx&quot;, false, true))">Session</a></li>
+                            <li>
+                                <a id="AccountPayment" href="javascript:__doPostBack(&#39;ctl00$AccountPayment&#39;,&#39;&#39;)">Payment</a></li>
+                            <li>
+                                <a id="AccountPurchase" href="javascript:__doPostBack(&#39;ctl00$AccountPurchase&#39;,&#39;&#39;)">Purchase</a></li>
+                            <li>                                
+                                </li>
+                            <li>
+
+                                <a id="AccountCase" href="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$AccountCase&quot;, &quot;&quot;, false, &quot;&quot;, &quot;Casemanagement.aspx&quot;, false, true))">Case</a></li>
+                            <li>
+                                <a id="AccountRecharge" href="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$AccountRecharge&quot;, &quot;&quot;, false, &quot;&quot;, &quot;Recharge.aspx&quot;, false, true))">Recharge</a></li>
+                            <li>
+                                <a id="AccountChangeModemPassword" href="javascript:__doPostBack(&#39;ctl00$AccountChangeModemPassword&#39;,&#39;&#39;)">Change Access Password</a></li>
+                            <li>
+                                <a id="AccountInbox" href="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$AccountInbox&quot;, &quot;&quot;, false, &quot;&quot;, &quot;AccountInbox.aspx&quot;, false, true))">Inbox</a></li>
+                            <li>
+                                </li>
+                            <li>
+                                <a id="AccountAttachment" href="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$AccountAttachment&quot;, &quot;&quot;, false, &quot;&quot;, &quot;AccountAttachment.aspx&quot;, false, true))">Documents</a>
+                            </li>
+                              <li>
+			                 </li>
+                            </li>
+                            <li>
+                                
+                            </li>
+
+                            
+                        </ul>
+                    </div>
+                    <script type="text/javascript">
+                        $(document).ready(function () {
+                            if ($.cookie('mIndex') == null) {
+                                //set_cookie("mIndex", 0)
+                                $.cookie('mIndex', 0);
+                                $("#mysf").html(getStr(0));
+                                $("#left").hide();
+                            }
+                            else {
+                                if ($.cookie('mIndex') == 0) {
+                                    $("#right").show();
+                                    $("#left").hide();
+                                    $("#mysf").html(getStr(0));
+                                    $("#mysf").hide();
+                                    $("#mysf").show("fast");
+                                }
+                                else {
+                                    $("#left").show();
+                                    $("#right").hide();
+                                    $("#mysf").html(getStr(11));
+                                    $("#mysf").hide();
+                                    $("#mysf").show("fast");
+                                }
+                            }
+                        });
+                        $("#right").click(function () {
+                            //set_cookie("mIndex", 11)
+                            $.cookie('mIndex', 11);
+                            $("#left").show();
+                            $("#right").hide();
+                            $("#mysf").html(getStr(11));
+                            $("#mysf").hide();
+                            $("#mysf").show("slow");
+                        });
+
+                        $("#left").click(function () {
+                            //set_cookie("mIndex", 0)
+                            $.cookie('mIndex', 0);
+                            $("#right").show();
+                            $("#left").hide();
+                            $("#mysf").html(getStr(0));
+                            $("#mysf").hide();
+                            $("#mysf").show("slow");
+                            //$("#ctl00_mnu").animate({ "left": "-=1000px" }, "slow");
+                        });
+
+                        function getStr(no) {
+                            var x = $("#base").html();
+                            //alert(x);
+                            var str = "";
+                            var j = 0;
+                            $(x).each(function (i) {
+
+
+                                //alert(i + ': ' + $(this).html());
+                                var sd = $(this).html();
+                                if (sd != null) {
+
+                                    if (j >= no && j <= (no + 10)) {
+                                        str += '<li>' + sd + '</li>';
+                                    }
+                                    j++;
+                                }
+                            });
+                            return str;
+                        }
+                    </script>
+                </div>
+            </div>
+            <div id="content_main" class="clearfix">
+                <div id="main_panel_container" class="left">
+                    <div id="clearfix">
+                        
+    <div id="ContentPlaceHolder1_upmain">
+	
+            
+<input type="submit" name="ctl00$ContentPlaceHolder1$ucQuickView$btnFree" value="" id="ContentPlaceHolder1_ucQuickView_btnFree" style="display: none" />
+<div id="ContentPlaceHolder1_ucQuickView_panEdit" class="ModalWindow">
+		
+    <center>
+          
+        <div id="ContentPlaceHolder1_ucQuickView_nodisp" style="width:90%;height:412px">
+            <div id="ContentPlaceHolder1_ucQuickView_UpdatePanel2" style="height:90% !important">
+			
+            <iframe id="ContentPlaceHolder1_ucQuickView_ifrm" scrolling="yes" style="width:100% !important ; align-content:center; text-align:center; align-items:center;  height:90% !important"></iframe>
+              
+        
+            
+            
+            
+            <input type="submit" name="ctl00$ContentPlaceHolder1$ucQuickView$btnClose" value="Close" id="ContentPlaceHolder1_ucQuickView_btnClose" class="btncrm" />
+
+                                             
+		</div>
+        </div>
+   
+        
+    </center>
+
+	</div>
+
+            <table border="1" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td align="left" valign="top" style="width: 85%">
+                        <table class="head_section" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th style="vertical-align: middle; padding-left: 10px; text-align: left; height: 32px;">
+                                    <b>Account </b>
+                                    <span id="ContentPlaceHolder1_lblCreate"></span>
+                                </th>
+                            </tr>
+                        </table>
+                        <div class="section custom-scroll-bar">
+                            <div style="text-align: left">
+                                
+                                
+                            </div>
+                            <table class="alter_col" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr style="display: none">
+                                    <td align="left" valign="top" width="15%">
+                                        <span id="ContentPlaceHolder1_lblown">User Name</span>
+                                    </td>
+                                    <td align="left" valign="top" width="35%">
+                                        <span id="ContentPlaceHolder1_txtoname" tabindex="1" class="aspNetDisabled">HARIKRUSHNA_KRUSHNANAGAR@vtpl</span>
+                                    </td>
+                                    <td align="left" valign="top" width="15%"></td>
+                                    <td align="left" valign="top" width="35%"></td>
+                                </tr>
+                                <tr>
+                                    <td align="left" valign="top" width="15%">
+                                        <span id="ContentPlaceHolder1_lblUSERNAME">User Name</span>
+                                    </td>
+                                    <td align="left" valign="top" width="35%">
+                                        <span id="ContentPlaceHolder1_lbl_USERNAME" tabindex="1">HARIKRUSHNA ADIECHA</span>
+                                    </td>
+                                    <td align="left" valign="top" width="15%">
+                                        <span id="ContentPlaceHolder1_lblMOBILENUMBER">Mobile Number</span>
+                                    </td>
+                                    <td align="left" valign="top" width="35%">
+                                        <span id="ContentPlaceHolder1_lbl_MOBILENUMBER" tabindex="1">9033319729</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left" valign="top" width="15%">
+                                        <span id="ContentPlaceHolder1_lblEMAIL">Email</span>
+                                    </td>
+                                    <td align="left" valign="top" width="35%">
+                                        <span id="ContentPlaceHolder1_lbl_EMAIL" tabindex="1"></span>
+                                    </td>
+                                    <td align="left" valign="top" width="15%">
+                                        
+                                    </td>
+                                    <td align="left" valign="top" width="35%">
+                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left" valign="top" width="15%">
+                                        <span id="ContentPlaceHolder1_lblCreateDate">Create Date</span>
+                                    </td>
+                                    <td align="left" valign="top" width="35%">
+                                        <span id="ContentPlaceHolder1_lbl_CreateDate" tabindex="1">28/07/2020 4:47 PM</span>
+                                    </td>
+                                    <td align="left" valign="top" width="15%">
+                                        <span id="ContentPlaceHolder1_lblActivationDate">Activation date</span>
+                                    </td>
+                                    <td align="left" valign="top" width="35%">
+                                        <span id="ContentPlaceHolder1_lbl_ActivationDate" tabindex="1">19/06/2021 12:00 AM</span>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table3">
+                                <tr>
+                                    <th colspan="4">Customer Summary
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <div id="ContentPlaceHolder1_tbAdditonal" class="MyTabStyle">
+		<div id="ContentPlaceHolder1_tbAdditonal_header" class="ajax__tab_header">
+			<span id="ContentPlaceHolder1_tbAdditonal_tpPlan_tab"><span class="ajax__tab_outer"><span class="ajax__tab_inner"><a class="ajax__tab_tab" id="__tab_ContentPlaceHolder1_tbAdditonal_tpPlan" href="#"><span>Plan</span></a></span></span></span><span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_tab"><span class="ajax__tab_outer"><span class="ajax__tab_inner"><a class="ajax__tab_tab" id="__tab_ContentPlaceHolder1_tbAdditonal_tpPlanhistory" href="#"><span>Plan History</span></a></span></span></span><span id="ContentPlaceHolder1_tbAdditonal_tpFutureplan_tab"><span class="ajax__tab_outer"><span class="ajax__tab_inner"><a class="ajax__tab_tab" id="__tab_ContentPlaceHolder1_tbAdditonal_tpFutureplan" href="#"><span>Future Plan</span></a></span></span></span>
+		</div><div id="ContentPlaceHolder1_tbAdditonal_body" class="ajax__tab_body" style="display:block;">
+			<div id="ContentPlaceHolder1_tbAdditonal_tpPlan" id="ContentPlaceHolder1_tbAdditonal_tpPlan" class="ajax__tab_panel" style="overflow: auto">
+				
+                                                    <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_upSession" style="display: inline">
+					
+          <style>
+        .aligncenter {
+        text-align:center !important;
+        }
+    </style>
+        <b>
+            
+        </b>
+        
+        <input type="submit" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucSessionPlanwise$btnSessionDetail" value="" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_btnSessionDetail" class="btncrm" style="display: none" />
+        <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_pnlSessionDetail" class="ModalWindow">
+						
+            <div style="float: right;">
+                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucSessionPlanwise$imgbtnclose" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_imgbtnclose" src="../img/close.png" style="margin-top: -24px; margin-left: -3px; position: absolute; margin-right: 0px" />
+            </div>
+            <table>
+                <tr>
+                    <td>
+                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_upExcel">
+							
+                                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucSessionPlanwise$btnExportExcel" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_btnExportExcel" title="Download To Excel" src="../img/xls123.png" align="middle" />
+                                <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_Label2" style="vertical-align: middle"><font size="5">|</font></span>
+                                
+                            
+						</div>
+                    </td>
+                    <td>
+                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_upCSV">
+							
+                                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucSessionPlanwise$btnExportCSV" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_btnExportCSV" title="Download To CSV" src="../img/csv123.png" align="middle" />
+                                <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_Label1" style="vertical-align: middle"><font size="5">|</font></span>
+                                
+                            
+						</div>
+                    </td>
+                    <td>
+                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_uppdf">
+							
+                                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucSessionPlanwise$btnpdf" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_btnpdf" title="Download To PDF" src="../img/pdf123.png" align="middle" />
+                                
+                            
+						</div>
+                        
+                                                   
+                    </td>
+                    <td>
+                        
+                        
+                      
+                                                    
+                    </td>
+                </tr>
+            </table>
+            <select name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucSessionPlanwise$ddlMonth" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_ddlMonth">
+							<option selected="selected" value="12">December &#39;2021</option>
+							<option value="11">November &#39;2021</option>
+							<option value="10">October &#39;2021</option>
+							<option value="9">September &#39;2021</option>
+							<option value="8">August &#39;2021</option>
+							<option value="7">July &#39;2021</option>
+							<option value="6">June &#39;2021</option>
+							<option value="5">May &#39;2021</option>
+							<option value="4">April &#39;2021</option>
+							<option value="3">March &#39;2021</option>
+							<option value="2">February &#39;2021</option>
+							<option value="1">January &#39;2021</option>
+
+						</select>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b>Total Usage Time(Hr.) :</b>
+            <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_lbtotalutime"></span>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b>Total Usage-Volume :</b>
+            <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_lbtotalusedvolumn"></span>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b>Total Download data :</b>
+            <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_lbtotaldownld"></span>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b>Total Upload data :</b>
+            <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_lbtotalUpload"></span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+            <select name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucSessionPlanwise$ddlPageSize" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_ddlPageSize">
+							<option selected="selected" value="10">10 Records</option>
+							<option value="20">20 Records</option>
+							<option value="50">50 Records</option>
+							<option value="100">100 Records</option>
+							<option value="200">200 Records</option>
+							<option value="300">300 Records</option>
+							<option value="500">500 Records</option>
+
+						</select>
+            <div style="height: 350px; overflow: auto">
+                <div>
+
+						</div>
+            </div>
+        
+					</div>
+    
+				</div>
+
+                                                    
+
+                                                    <div>
+					<table class="table2" cellspacing="0" rules="all" border="1" id="ContentPlaceHolder1_tbAdditonal_tpPlan_gdPlan" width="100%">
+						<tr>
+							<th scope="col" width="140">Plan Name</th><th scope="col" width="100">Activation Date</th><th scope="col" width="100">Expiry Date</th><th scope="col" width="80">Validity</th><th scope="col" width="100">Unused Quota(MB/Hrs)</th><th scope="col" width="100">Used Quota(MB/Hrs)</th><th scope="col" width="80">Sessions</th><th scope="col" width="80">&nbsp;</th>
+						</tr><tr bgcolor="White">
+							<td width="140">
+                                                                    
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_gdPlan_lblPlan_0">100 2500GB-Data 1</span>
+                                                                    
+                                                                    
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_gdPlan_lblActivationDate_0">19/06/2021 12:00:00 AM</span>
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_gdPlan_lblExpiryDate_0">18/06/2022 11:59:59 PM</span>
+                                                                </td><td width="80">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_gdPlan_lblvalidity_0">12</span>&nbsp<span id="ContentPlaceHolder1_tbAdditonal_tpPlan_gdPlan_Label41_0">Month</span>
+                                                                    
+                                                                    
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_gdPlan_lblRemain_0">1659012/-</span>
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_gdPlan_lblUsed_0">900987/209775</span>
+                                                                </td><td width="80">
+                                                                    <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$gdPlan$ctl02$ibCDRView" id="ContentPlaceHolder1_tbAdditonal_tpPlan_gdPlan_ibCDRView_0" src="../img/quicklook-icon1.png" align="middle" />
+                                                                </td><td width="80">
+                                                                    
+                                                                     
+                                                                    
+                                                               
+                                                                
+                                                                </td>
+						</tr>
+					</table>
+				</div>
+                                                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_upSession" style="display: inline">
+					
+        
+        <input type="submit" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucVoicePlanwiseSession$btnSessionDetail" value="" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_btnSessionDetail" class="btncrm" style="display: none" />
+        <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_pnlSessionDetail" class="ModalWindow">
+						
+            <div style="float: right;">
+                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucVoicePlanwiseSession$imgbtnclose" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_imgbtnclose" src="../img/close.png" style="margin-top: -24px; margin-left: -3px; position: absolute; margin-right: 0px" />
+            </div>
+            <table>
+                <tr>
+                    <td>
+                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_upExcel">
+							
+                                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucVoicePlanwiseSession$btnExportExcel" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_btnExportExcel" title="Download To Excel" src="../img/xls123.png" align="middle" />
+                                <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_Label2" style="vertical-align: middle"><font size="5">|</font></span>
+                                
+                            
+						</div>
+                    </td>
+                    <td>
+                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_upCSV">
+							
+                                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucVoicePlanwiseSession$btnExportCSV" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_btnExportCSV" title="Download To CSV" src="../img/csv123.png" align="middle" />
+                                <span id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_Label1" style="vertical-align: middle"><font size="5">|</font></span>
+                            
+						</div>
+                    </td>
+                    <td>
+                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_uppdf">
+							
+                                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucVoicePlanwiseSession$btnpdf" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_btnpdf" title="Download To PDF" src="../img/pdf123.png" align="middle" />
+                                
+                            
+						</div>
+
+                    </td>
+                    <td>
+                        
+                        
+
+                    </td>
+                </tr>
+            </table>
+            <select name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucVoicePlanwiseSession$ddlVoiceMonth" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_ddlVoiceMonth">
+							<option selected="selected" value="12">December &#39;2021</option>
+							<option value="11">November &#39;2021</option>
+							<option value="10">October &#39;2021</option>
+							<option value="9">September &#39;2021</option>
+							<option value="8">August &#39;2021</option>
+							<option value="7">July &#39;2021</option>
+							<option value="6">June &#39;2021</option>
+							<option value="5">May &#39;2021</option>
+							<option value="4">April &#39;2021</option>
+							<option value="3">March &#39;2021</option>
+							<option value="2">February &#39;2021</option>
+							<option value="1">January &#39;2021</option>
+
+						</select>
+            <select name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlan$ucVoicePlanwiseSession$ddlPageSize" id="ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_ddlPageSize">
+							<option selected="selected" value="10">10 Records</option>
+							<option value="20">20 Records</option>
+							<option value="50">50 Records</option>
+							<option value="100">100 Records</option>
+							<option value="200">200 Records</option>
+							<option value="300">300 Records</option>
+							<option value="500">500 Records</option>
+
+						</select>
+            <div style="height: 350px; overflow: auto">
+                <div>
+
+						</div>
+            </div>
+        
+					</div>
+    
+				</div>
+
+                                                    <div>
+
+				</div>
+                                                    
+                                                
+			</div><div id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory" class="ajax__tab_panel" style="display:none;overflow: auto">
+				
+                                                    <div id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_upSession" style="display: inline">
+					
+          <style>
+        .aligncenter {
+        text-align:center !important;
+        }
+    </style>
+        <b>
+            
+        </b>
+        
+        <input type="submit" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$ucSessionPlanHiswise$btnSessionDetail" value="" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_btnSessionDetail" class="btncrm" style="display: none" />
+        <div id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_pnlSessionDetail" class="ModalWindow">
+						
+            <div style="float: right;">
+                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$ucSessionPlanHiswise$imgbtnclose" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_imgbtnclose" src="../img/close.png" style="margin-top: -24px; margin-left: -3px; position: absolute; margin-right: 0px" />
+            </div>
+            <table>
+                <tr>
+                    <td>
+                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_upExcel">
+							
+                                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$ucSessionPlanHiswise$btnExportExcel" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_btnExportExcel" title="Download To Excel" src="../img/xls123.png" align="middle" />
+                                <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_Label2" style="vertical-align: middle"><font size="5">|</font></span>
+                                
+                            
+						</div>
+                    </td>
+                    <td>
+                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_upCSV">
+							
+                                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$ucSessionPlanHiswise$btnExportCSV" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_btnExportCSV" title="Download To CSV" src="../img/csv123.png" align="middle" />
+                                <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_Label1" style="vertical-align: middle"><font size="5">|</font></span>
+                                
+                            
+						</div>
+                    </td>
+                    <td>
+                        <div id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_uppdf">
+							
+                                <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$ucSessionPlanHiswise$btnpdf" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_btnpdf" title="Download To PDF" src="../img/pdf123.png" align="middle" />
+                                
+                            
+						</div>
+                        
+                                                   
+                    </td>
+                    <td>
+                        
+                        
+                      
+                                                    
+                    </td>
+                </tr>
+            </table>
+            <select name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$ucSessionPlanHiswise$ddlMonth" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_ddlMonth">
+							<option selected="selected" value="12">December &#39;2021</option>
+							<option value="11">November &#39;2021</option>
+							<option value="10">October &#39;2021</option>
+							<option value="9">September &#39;2021</option>
+							<option value="8">August &#39;2021</option>
+							<option value="7">July &#39;2021</option>
+							<option value="6">June &#39;2021</option>
+							<option value="5">May &#39;2021</option>
+							<option value="4">April &#39;2021</option>
+							<option value="3">March &#39;2021</option>
+							<option value="2">February &#39;2021</option>
+							<option value="1">January &#39;2021</option>
+
+						</select>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b>Total Usage Time(Hr.) :</b>
+            <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_lbtotalutime"></span>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b>Total Usage-Volume :</b>
+            <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_lbtotalusedvolumn"></span>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b>Total Download data :</b>
+            <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_lbtotaldownld"></span>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <b>Total Upload data :</b>
+            <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_lbtotalUpload"></span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+            <select name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$ucSessionPlanHiswise$ddlPageSize" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_ddlPageSize">
+							<option selected="selected" value="10">10 Records</option>
+							<option value="20">20 Records</option>
+							<option value="50">50 Records</option>
+							<option value="100">100 Records</option>
+							<option value="200">200 Records</option>
+							<option value="300">300 Records</option>
+							<option value="500">500 Records</option>
+
+						</select>
+            <div style="height: 350px; overflow: auto">
+                <div>
+
+						</div>
+            </div>
+        
+					</div>
+    
+				</div>
+
+                                                      
+
+                                                    <div>
+					<table class="table2" cellspacing="0" rules="all" border="1" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory" width="100%">
+						<tr>
+							<th scope="col" width="140">Plan Name</th><th scope="col" width="100">Activation Date</th><th scope="col" width="120">Expiry Date</th><th scope="col" width="80">Validity Period</th><th scope="col" width="100">Used Quota(MB/Hrs)</th><th scope="col" width="100">Unused Quota(MB/Hrs)</th><th scope="col" width="80">Sessions</th><th scope="col" width="80">&nbsp;</th>
+						</tr><tr bgcolor="White">
+							<td width="140">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblPlan_0">100 Mbps 2000gb-Data 1</span>
+                                                                    
+                                                                    
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblActivationDate_0">28/07/2020 12:00:00 AM</span>
+                                                                </td><td width="120">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblExpiryDate_0">19/06/2021 12:00:00 AM</span>
+                                                                </td><td width="80">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblvalidity_0">12</span>&nbsp<span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_Label41_0">Month</span>
+                                                                    
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblUsed_0">2048045/7287</span>
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblRemain_0">-45/-</span>
+                                                                </td><td width="80">
+
+                                                                    <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$gvPlanHistory$ctl02$ibCDRViewHistory" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_ibCDRViewHistory_0" src="../img/quicklook-icon1.png" align="middle" />
+                                                                </td><td width="80">
+                                                                    
+                                                                
+                                                                     
+                                                                    
+                                                              
+
+                                                                </td>
+						</tr><tr bgcolor="White">
+							<td width="140">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblPlan_1">100 2500GB-Data 1</span>
+                                                                    
+                                                                    
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblActivationDate_1">28/07/2020 12:00:00 AM</span>
+                                                                </td><td width="120">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblExpiryDate_1">28/07/2020 12:00:00 AM</span>
+                                                                </td><td width="80">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblvalidity_1">12</span>&nbsp<span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_Label41_1">Month</span>
+                                                                    
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblUsed_1">8/0</span>
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblRemain_1">2559991/-</span>
+                                                                </td><td width="80">
+
+                                                                    <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$gvPlanHistory$ctl03$ibCDRViewHistory" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_ibCDRViewHistory_1" src="../img/quicklook-icon1.png" align="middle" />
+                                                                </td><td width="80">
+                                                                    
+                                                                
+                                                                     
+                                                                    
+                                                              
+
+                                                                </td>
+						</tr><tr bgcolor="White">
+							<td width="140">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblPlan_2">100 Mbps 2000gb-Data 1</span>
+                                                                    
+                                                                    
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblActivationDate_2">28/07/2020 12:00:00 AM</span>
+                                                                </td><td width="120">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblExpiryDate_2">28/07/2020 12:00:00 AM</span>
+                                                                </td><td width="80">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblvalidity_2">12</span>&nbsp<span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_Label41_2">Month</span>
+                                                                    
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblUsed_2">1866/1</span>
+                                                                </td><td width="100">
+                                                                    <span id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_lblRemain_2">2046133/-</span>
+                                                                </td><td width="80">
+
+                                                                    <input type="image" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpPlanhistory$gvPlanHistory$ctl04$ibCDRViewHistory" id="ContentPlaceHolder1_tbAdditonal_tpPlanhistory_gvPlanHistory_ibCDRViewHistory_2" src="../img/quicklook-icon1.png" align="middle" />
+                                                                </td><td width="80">
+                                                                    
+                                                                
+                                                                     
+                                                                    
+                                                              
+
+                                                                </td>
+						</tr>
+					</table>
+				</div>
+                                                  
+                                                
+			</div><div id="ContentPlaceHolder1_tbAdditonal_tpFutureplan" id="ContentPlaceHolder1_tbAdditonal_tpFutureplan" class="ajax__tab_panel" style="display:none;">
+				
+                                                    
+<input type="submit" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpFutureplan$ucQuickView5$btnFree" value="" id="ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_btnFree" style="display: none" />
+<div id="ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_panEdit" class="ModalWindow">
+					
+    <center>
+          
+        <div id="ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_nodisp" style="width:90%;height:412px">
+            <div id="ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_UpdatePanel2" style="height:90% !important">
+						
+            <iframe id="ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_ifrm" scrolling="yes" style="width:100% !important ; align-content:center; text-align:center; align-items:center;  height:90% !important"></iframe>
+              
+        
+            
+            
+            
+            <input type="submit" name="ctl00$ContentPlaceHolder1$tbAdditonal$tpFutureplan$ucQuickView5$btnClose" value="Close" id="ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_btnClose" class="btncrm" />
+
+                                             
+					</div>
+        </div>
+   
+        
+    </center>
+
+				</div>
+
+                                                     
+
+                                                    <div>
+					<table class="table2" cellspacing="0" rules="all" border="1" id="ContentPlaceHolder1_tbAdditonal_tpFutureplan_gdFuturePlan" width="100%">
+						<tr>
+							<td colspan="7">
+                                                            <span id="ContentPlaceHolder1_tbAdditonal_tpFutureplan_gdFuturePlan_lblEmptyMessage">There are no recent Plan.</span>
+                                                        </td>
+						</tr>
+					</table>
+				</div>
+                                                    
+                                                
+			</div>
+		</div>
+	</div>
+                                        
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        
+</div>
+
+                    </div>
+                    <div id="UpdatePanel1">
+	
+                            <input type="submit" name="ctl00$btnopen" value="" id="btnopen" style="display: none" />
+                        
+</div>
+                </div>
+            </div>
+            <div id="UpdatePanel2">
+	
+                    <div id="H_plus_window" class="hid_unhide drsElement" style="background-color: White; width: 170px; height: 250px; position: fixed; z-index: 1; top: 120px; left: 0%">
+                        <div align="right">
+                            <input type="image" name="ctl00$img_close" id="img_close" src="../img/error.jpg" />
+                        </div>
+                        <div class="drsMoveHandle">
+                            Recent Update
+                        </div>
+                        <div class="custom-scroll-bar" style="overflow: hidden;">
+		
+                            <div style="padding: 5px">
+                                <div id="Accordion11">
+			<input type="hidden" name="ctl00$Accordion11_AccordionExtender_ClientState" id="Accordion11_AccordionExtender_ClientState" value="0" /><div id="apActivity_header" class="accordionHeaderSelected">
+				
+                                            Activity
+                                        
+			</div><div id="apActivity_content" class="accordionContent" style="display:block;">
+				
+                                                <div>
+
+				</div>
+                                            
+			</div><div id="AccordionPane1_header" class="accordionHeader">
+				
+                                            Appointment
+                                        
+			</div><div id="AccordionPane1_content" class="accordionContent" style="display:none;">
+				
+                                                <div>
+
+				</div>
+                                            
+			</div><div id="AccordionPane2_header" class="accordionHeader">
+				
+                                            Meeting
+                                        
+			</div><div id="AccordionPane2_content" class="accordionContent" style="display:none;">
+				
+                                                <div>
+
+				</div>
+                                            
+			</div><div id="AccordionPane3_header" class="accordionHeader">
+				
+                                            Funnel
+                                        
+			</div><div id="AccordionPane3_content" class="accordionContent" style="display:none;">
+				
+                                                <div>
+
+				</div>
+                                            
+			</div>
+		</div>
+                            </div>
+                            <input type="submit" name="ctl00$OKButton" value="Close" id="OKButton" class="btncrm" style="display: none" />
+                        
+	</div>
+                    </div>
+                
+</div>
+            <div style="width: 37px; position: absolute; z-index: 10; top: 350px; left: 0px;">
+            </div>
+            <input name="ctl00$lbllgout" type="text" value="0" id="lbllgout" style="display: none" />
+            <input name="ctl00$lblRtxt" type="text" value="0" id="lblRtxt" style="display: none" />
+        
+
+<script type="text/javascript">
+//<![CDATA[
+(function() {var fn = function() {$get("ToolkitScriptManager1_HiddenField").value = '';Sys.Application.remove_init(fn);};Sys.Application.add_init(fn);})();Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.ModalPopupBehavior, {"BackgroundCssClass":"modalBackground","CancelControlID":"btnCancelCInfo","PopupControlID":"pnlcon","dynamicServicePath":"/vtpl/customer/AccountViewPlan.aspx","id":"modlpopContInfo"}, null, null, $get("btnFree2"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.UI._Timer, {"enabled":false,"interval":10000,"uniqueID":"ctl00$Timer1"}, null, null, $get("Timer1"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.ModalPopupBehavior, {"BackgroundCssClass":"modalBackground","CancelControlID":"callCancel","PopupControlID":"panEdit","dynamicServicePath":"/vtpl/customer/AccountViewPlan.aspx","id":"ModalPopupExtender1"}, null, null, $get("btnFree"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.ModalPopupBehavior, {"BackgroundCssClass":"modalBackground","CancelControlID":"ContentPlaceHolder1_ucQuickView_btnClose","PopupControlID":"ContentPlaceHolder1_ucQuickView_panEdit","dynamicServicePath":"/vtpl/customer/AccountViewPlan.aspx","id":"ContentPlaceHolder1_ucQuickView_modpeQuickView"}, null, null, $get("ContentPlaceHolder1_ucQuickView_btnFree"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.ModalPopupBehavior, {"BackgroundCssClass":"modalBackground","CancelControlID":"ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_imgbtnclose","PopupControlID":"ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_pnlSessionDetail","dynamicServicePath":"/vtpl/customer/AccountViewPlan.aspx","id":"ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_mpeSessionDetail"}, null, null, $get("ContentPlaceHolder1_tbAdditonal_tpPlan_ucSessionPlanwise_btnSessionDetail"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.ModalPopupBehavior, {"BackgroundCssClass":"modalBackground","CancelControlID":"ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_imgbtnclose","PopupControlID":"ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_pnlSessionDetail","dynamicServicePath":"/vtpl/customer/AccountViewPlan.aspx","id":"ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_mpeSessionDetail"}, null, null, $get("ContentPlaceHolder1_tbAdditonal_tpPlan_ucVoicePlanwiseSession_btnSessionDetail"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.TabPanel, {"headerTab":$get("__tab_ContentPlaceHolder1_tbAdditonal_tpPlan"),"ownerID":"ContentPlaceHolder1_tbAdditonal"}, null, {"owner":"ContentPlaceHolder1_tbAdditonal"}, $get("ContentPlaceHolder1_tbAdditonal_tpPlan"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.ModalPopupBehavior, {"BackgroundCssClass":"modalBackground","CancelControlID":"ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_imgbtnclose","PopupControlID":"ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_pnlSessionDetail","dynamicServicePath":"/vtpl/customer/AccountViewPlan.aspx","id":"ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_mpeSessionDetail"}, null, null, $get("ContentPlaceHolder1_tbAdditonal_tpPlanhistory_ucSessionPlanHiswise_btnSessionDetail"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.TabPanel, {"headerTab":$get("__tab_ContentPlaceHolder1_tbAdditonal_tpPlanhistory"),"ownerID":"ContentPlaceHolder1_tbAdditonal"}, null, {"owner":"ContentPlaceHolder1_tbAdditonal"}, $get("ContentPlaceHolder1_tbAdditonal_tpPlanhistory"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.ModalPopupBehavior, {"BackgroundCssClass":"modalBackground","CancelControlID":"ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_btnClose","PopupControlID":"ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_panEdit","dynamicServicePath":"/vtpl/customer/AccountViewPlan.aspx","id":"ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_modpeQuickView"}, null, null, $get("ContentPlaceHolder1_tbAdditonal_tpFutureplan_ucQuickView5_btnFree"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.TabPanel, {"headerTab":$get("__tab_ContentPlaceHolder1_tbAdditonal_tpFutureplan"),"ownerID":"ContentPlaceHolder1_tbAdditonal"}, null, {"owner":"ContentPlaceHolder1_tbAdditonal"}, $get("ContentPlaceHolder1_tbAdditonal_tpFutureplan"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.TabContainer, {"activeTabIndex":0,"clientStateField":$get("ContentPlaceHolder1_tbAdditonal_ClientState"),"onDemand":false,"tabStripPlacement":0,"useVerticalStripPlacement":false}, null, null, $get("ContentPlaceHolder1_tbAdditonal"));
+});
+Sys.Application.add_init(function() {
+    $create(Sys.Extended.UI.AccordionBehavior, {"ClientStateFieldID":"Accordion11_AccordionExtender_ClientState","FadeTransitions":true,"FramesPerSecond":40,"HeaderCssClass":"accordionHeader","HeaderSelectedCssClass":"accordionHeaderSelected","id":"Accordion11_AccordionExtender","requireOpenedPane":false,"suppressHeaderPostbacks":true}, null, null, $get("Accordion11"));
+});
+//]]>
+</script>
+</form>
+        <!-- end #footer -->
+    </div>
+    <div id="t" class="main_container" style="width: 100px; height: 150px; position: fixed; z-index: 1; bottom: 100px; left: 1%">
+        <span id="lblUname" style="font-weight: bold; width: 225; background-color: #193356; color: White; border: 1px solid #c3c3c3; margin: 3px; background-position: left center; margin-left: 0px; padding: 5px 15px 5px 15px; border-radius: 5px">User</span>
+        
+        <select name="ctl00$lstuser" id="lstuser" style="background-image: none !important" class="active_user custom-scroll-bar" size="10" onchange="lstuser_changed" onclick="javascript:chatWith_CUST(this.value)">
+</select>
+    </div>
+    <div id="dvOnProcess" style="display: none; z-index: 150000; background-color: #336699; height: 100%; width: 100%; position: fixed; left: 0px; top: 0px; opacity: 0.4;">
+        <center>
+            <img src="../img/gears-animation.gif" style="height: 300px; width: 250px; margin-top: 200px" alt="Wait..." />
+            <h3><a href="#" style="color: whitesmoke" onclick="javascript:location.reload();">Click here to refresh page, if it is taking longer than expected! </a></h3>
+        </center>
+    </div>
+    <div align="center" id="footer" style="height: 15px; width: 100%" class="clearfix">
+        <p style="width: 95%">
+            <span class="left" style="float: left">
+                <span id="lblORG">Height8tech</span></span> <span class="left" style="float: left; width: 60%; color: #4d8ccd; padding-left: 90px">
+                    <marquee onmouseover="this.stop();" onmouseout="this.start();">
+ <span id="lblNtfcMsg"> Welcome HARIKRUSHNA ADIECHA to iCRM.</span>
+</marquee>
+                </span><span class="right" style="float: right">
+                    <span id="lblCopyright">&copy;Powered by: Height8 Technologies</span></span>
+        </p>
+    </div>
+    <div id="result">
+    </div>
+    
+</body>
+<script type="text/javascript">
+
+    $(document).ready(function () { $('span[rel=tooltip]').mouseover(function (e) { var tip = $(this).attr('title'); $(this).attr('title', ''); $(this).append('<div id="tooltip"><div class="tipHeader"></div><div class="tipBody">' + tip + '</div><div class="tipFooter"></div></div>'); $('#tooltip').fadeIn('1000'); $('#tooltip').fadeTo('1000', 0.9) }).mousemove(function (e) { $('#tooltip').css('top', e.pageY + 10); $('#tooltip').css('left', e.pageX + 20) }).mouseout(function () { $(this).attr('title', $('.tipBody').html()); $(this).children('div#tooltip').remove() }) });
+
+
+
+    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(EndRequestHandler);
+    function EndRequestHandler(sender, args) {
+        $(document).ready(function () { $('span[rel=tooltip]').mouseover(function (e) { var tip = $(this).attr('title'); $(this).attr('title', ''); $(this).append('<div id="tooltip"><div class="tipHeader"></div><div class="tipBody">' + tip + '</div><div class="tipFooter"></div></div>'); $('#tooltip').fadeIn('1000'); $('#tooltip').fadeTo('1000', 0.9) }).mousemove(function (e) { $('#tooltip').css('top', e.pageY + 10); $('#tooltip').css('left', e.pageX + 20) }).mouseout(function () { $(this).attr('title', $('.tipBody').html()); $(this).children('div#tooltip').remove() }) });
+    }
+</script>
+<script type="text/javascript">
+    shortcut.add("Ctrl+Shift+F", function () { document.getElementById("ctl00_ContentPlaceHolder1_ucSelectUsersTeam_btnOK").click() }); shortcut.add("Ctrl+Shift+F", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnserch").click() }); shortcut.add("Ctrl+Shift+P", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnPending").click() }); shortcut.add("Ctrl+Shift+C", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnCompleted").click() }); shortcut.add("Ctrl+Shift+A", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnAll").click() }); shortcut.add("Ctrl+Shift+S", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnsave").click() }); shortcut.add("Ctrl+Shift+S", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnSaveD").click() }); shortcut.add("Ctrl+Shift+S", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnsvnw").click() }); shortcut.add("Ctrl+Shift+E", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnCancelD").click() }); shortcut.add("Ctrl+Shift+E", function () { document.getElementById("ctl00_ContentPlaceHolder1_btncancel").click() }); shortcut.add("Ctrl+Alt+N", function () { window.location.href = document.getElementById("ctl00_ContentPlaceHolder1_addnewprd").href }); shortcut.add("Ctrl+Alt+N", function () { document.getElementById("ctl00_ContentPlaceHolder1_addrol").click() }); shortcut.add("Ctrl+Alt+N", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnnew").click() }); shortcut.add("Ctrl+Alt+T", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnwfol").click() }); shortcut.add("Ctrl+Shift+D", function () { document.getElementById("ctl00_ContentPlaceHolder1_ibtn_delete").click() }); shortcut.add("Ctrl+Shift+R", function () { document.getElementById("ctl00_ContentPlaceHolder1_btnShowReport").click() })
+
+
+
+    $("#t").hide();
+    $("#H_plus_window").hide();
+    $("#chart").hide();
+    $(document).ready(function () {
+        $("#H_plus_window").removeClass('hid_unhide');
+
+        $(".dash_btn").click(function () {
+            $("#chart").slideToggle("slow")
+        });
+        $("#p1").click(function () {
+            $("#t").slideToggle("slow")
+        });
+
+        $("#H_plus").click(function () {
+            $("#H_plus_window").slideToggle("slow")
+        });
+
+        $("#img_close").click(function () {
+            $("#H_plus_window").slideToggle("slow")
+        })
+    });
+
+
+    f1();
+    function f1() {
+
+        var x = document.getElementById('lblRtxt');
+
+        if (x != null) {
+            if (x.value == 1) {
+                var mycontent = $('.alter_col').html();
+                var mycontentHead = $('.head_section').html();
+
+                mycontent = '<table class="special">' + mycontentHead + '</table>' + '<table class="alter_col" >' + mycontent + '</table>';
+                //mycontentHead +=" <link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href='./../css/" + style5.css +"' />";
+                mycontent += '<link rel="stylesheet" type="text/css" media="all" href="./../css/style5.css" />';
+                $('body').html(mycontent); $(".btncrm").hide(); $('body').css("background", "white");
+                //$("body").addClass("table2");;
+            }
+            if (x.value == 2) {
+
+                $('#header').hide();
+                $('#content').hide();
+                $('.side_text').hide();
+                $('#footer').hide();
+                $('#H_plus').hide();
+                $('.main_container').hide();
+                $("#content_main").css("width", "853");
+                $("#ctl00_ContentPlaceHolder1_btncancel").hide();
+            }
+        }
+        else {
+            setTimeout("f1()", 5);
+        }
+    };
+
+</script>
+<!-- <script type="text/javascript" src="js/drag.js"></script> -->
+<style type="text/css">
+    /* Apply the element you want to drag/resize */ .drsElement {
+        position: absolute;
+        border: 1px solid #333;
+    }
+
+    .drsMoveHandle {
+        height: 20px;
+        background-color: #CCC;
+        border-bottom: 1px solid #666;
+        cursor: move;
+        padding: 5px 20px;
+    }
+
+    .dragresize {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        font-size: 1px;
+        background: #EEE;
+        border: 1px solid #333;
+    }
+
+    .dragresize-tl {
+        top: -8px;
+        left: -8px;
+        cursor: nw-resize;
+    }
+
+    .dragresize-tr {
+        top: -8px;
+        right: -8px;
+        cursor: ne-resize;
+    }
+
+    .dragresize-bl {
+        bottom: -8px;
+        left: -8px;
+        cursor: sw-resize;
+    }
+
+    .dragresize-br {
+        bottom: -8px;
+        right: -8px;
+        cursor: se-resize;
+    }
+</style>
+<script type="text/javascript">
+    //<![CDATA[
+
+    // Using DragResize is simple!
+    // You first declare a new DragResize() object, passing its own name and an object
+    // whose keys constitute optional parameters/settings:
+
+    var dragresize = new DragResize('dragresize',
+ { minWidth: 50, minHeight: 50, minLeft: 20, minTop: 20, maxLeft: 600, maxTop: 600 });
+
+    // Optional settings/properties of the DragResize object are:
+    //  enabled: Toggle whether the object is active.
+    //  handles[]: An array of drag handles to use (see the .JS file).
+    //  minWidth, minHeight: Minimum size to which elements are resized (in pixels).
+    //  minLeft, maxLeft, minTop, maxTop: Bounding box (in pixels).
+
+    // Next, you must define two functions, isElement and isHandle. These are passed
+    // a given DOM element, and must "return true" if the element in question is a
+    // draggable element or draggable handle. Here, I'm checking for the CSS classname
+    // of the elements, but you have have any combination of conditions you like:
+
+    dragresize.isElement = function (elm) {
+        if (elm.className && elm.className.indexOf('drsElement') > -1) return true;
+    };
+    dragresize.isHandle = function (elm) {
+        if (elm.className && elm.className.indexOf('drsMoveHandle') > -1) return true;
+    };
+
+    // You can define optional functions that are called as elements are dragged/resized.
+    // Some are passed true if the source event was a resize, or false if it's a drag.
+    // The focus/blur events are called as handles are added/removed from an object,
+    // and the others are called as users drag, move and release the object's handles.
+    // You might use these to examine the properties of the DragResize object to sync
+    // other page elements, etc.
+
+    dragresize.ondragfocus = function () { };
+    dragresize.ondragstart = function (isResize) { };
+    dragresize.ondragmove = function (isResize) { };
+    dragresize.ondragend = function (isResize) { };
+    dragresize.ondragblur = function () { };
+
+    // Finally, you must apply() your DragResize object to a DOM node; all children of this
+    // node will then be made draggable. Here, I'm applying to the entire document.
+    dragresize.apply(document);
+
+    //]]>
+
+</script>
+<script type="text/javascript">
+    try {
+
+        $(document).ready(function () {
+            if ($(".alter_col").val() != null) {
+                $("#tagshow").show();
+                $("#taghide").hide();
+            }
+            else {
+                $("#tagshow").hide();
+                $("#taghide").show();
+            }
+
+            //$('span[rel=tooltip]').mouseover(function(e) { var tip = $(this).attr('title'); $(this).attr('title', ''); $(this).append('<div id="tooltip"><div class="tipHeader"></div><div class="tipBody">' + tip + '</div><div class="tipFooter"></div></div>'); $('#tooltip').fadeIn('1000'); $('#tooltip').fadeTo('1000', 0.9) }).mousemove(function(e) { $('#tooltip').css('top', e.pageY + 10); $('#tooltip').css('left', e.pageX + 20) }).mouseout(function() { $(this).attr('title', $('.tipBody').html()); $(this).children('div#tooltip').remove() })
+
+            try {
+                $("img[title],input[title],a[title],span[title]").poshytip({
+                    className: "tip-darkgray",
+                    bgImageFrameSize: 9
+                });
+                $("area").poshytip({
+                    className: "tip-darkgray",
+                    bgImageFrameSize: 9
+                });
+            } catch (err) {
+                alert(err);
+            }
+        });
+        Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(BeginRequestHandlerMstr);
+        Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded(EndRequestHandlerMstr);
+        Sys.WebForms.PageRequestManager.getInstance().add_endRequest(EndRequestHandlerMstrErr);
+        function BeginRequestHandlerMstr(sender, args) {
+            var elem = args.get_postBackElement();
+            fadeIt(0);
+            //ActivateAlertDiv('visible', 'AlertDiv', elem.value + ' processing...');
+        }
+        function EndRequestHandlerMstrErr(sender, args) {
+
+            fadeIt(1);
+            if (args.get_error() != null) {
+                alert(args.get_error().message);
+            }
+
+            //ActivateAlertDiv('visible', 'AlertDiv', elem.value + ' processing...');
+        }
+        function EndRequestHandlerMstr(sender, args) {
+            try {
+
+                fadeIt(1);
+                $(document).ready(function () {
+                    //$('span[title]').mouseover(function (e) { var tip = $(this).attr('title'); $(this).attr('title', ''); $(this).append('<div id="tooltip"><div class="tipHeader"></div><div class="tipBody">' + tip + '</div><div class="tipFooter"></div></div>'); $('#tooltip').fadeIn('1000'); $('#tooltip').fadeTo('1000', 0.9) }).mousemove(function (e) { $('#tooltip').css('top', e.pageY + 10); $('#tooltip').css('left', e.pageX + 20) }).mouseout(function () { $(this).attr('title', $('.tipBody').html()); $(this).children('div#tooltip').remove() })
+
+                    $("img[title],input[title],a[title],span[title]").poshytip({
+                        className: "tip-darkgray",
+                        bgImageFrameSize: 9
+                    });
+                    $("area").poshytip({
+                        className: "tip-darkgray",
+                        bgImageFrameSize: 9
+                    });
+                    if ($(".alter_col").val() != null) {
+                        $("#tagshow").show();
+                        $("#taghide").hide();
+                    }
+                    else {
+                        $("#tagshow").hide();
+                        $("#taghide").show();
+                    }
+
+                });
+            } catch (err) {
+                alert(err);
+            }
+            //ActivateAlertDiv('hidden', 'AlertDiv', '');
+        }
+        function fadeIt(f) {
+            if (f == 0) {
+                $("#dvOnProcess").show();
+            }
+            else {
+                $("#dvOnProcess").hide();
+            }
+        }
+    }
+    catch (err) {
+
+    }
+</script>
+</html>
