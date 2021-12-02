@@ -111,7 +111,7 @@ func addData(used int, remain int, gist *Gist) {
 			rec := Record{}
 			rec.Available = remain
 			rec.Used = used
-			rec.RecordedAt = time.Now().UnixMilli()
+			rec.RecordedAt = time.Now().UnixNano() / 1000000
 			dc.Records = append(dc.Records, rec)
 
 			cnt, err := json.Marshal(dc)
