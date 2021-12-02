@@ -128,5 +128,5 @@ func addData(used int, remain int, gist *Gist) {
 func StoreData(used int, remain int) {
 	gist := getGist()
 	addData(used, remain, gist)
-	// saveGist(gist)
+	saveGist(gist)
 }
